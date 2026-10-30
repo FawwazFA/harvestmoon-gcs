@@ -15,7 +15,9 @@ DATASHEET_PDP/
 │   └── BOOTH_RUNBOOK_TEKNOFEST.docx          (runbook operasional booth)
 │
 ├── 02_AI_Model/              ← Model YOLO & spesifikasi visi komputer
-│   ├── VISION_DATASHEET_MOONHARVEST.docx    (datasheet utama model AI)
+│   ├── VISION_DATASHEET_MOONHARVEST_NEW.docx (datasheet utama hasil re-training video sawah)
+│   ├── VISION_DATASHEET_MOONHARVEST_NEW.md   (versi markdown datasheet baru)
+│   ├── VISION_DATASHEET_MOONHARVEST.docx    (datasheet model legacy/arsip)
 │   └── YOLO_MODELS_README.md                (panduan model & class files)
 │
 ├── 03_Companion_System/      ← Dokumentasi Orange Pi companion drone
@@ -39,7 +41,8 @@ DATASHEET_PDP/
 
 | Prioritas | File | Kegunaan |
 |-----------|------|---------|
-| ★★★ | `02_AI_Model/VISION_DATASHEET_MOONHARVEST.docx` | Datasheet utama model AI untuk reviewer |
+| ★★★ | `02_AI_Model/VISION_DATASHEET_MOONHARVEST_NEW.docx` | Datasheet utama model AI terbaru (dataset video sawah) |
+| ★★★ | `02_AI_Model/VISION_DATASHEET_MOONHARVEST_NEW.md`   | Versi Markdown untuk repositori & pembacaan cepat |
 | ★★★ | `04_Flight_Checklist/PRE_FLIGHT_CHECKLIST_PDP.md` | Wajib sebelum setiap penerbangan |
 | ★★ | `01_GCS_Software/PANDUAN_PENGGUNAAN_MOONHARVEST.docx` | Manual lengkap GCS |
 | ★★ | `03_Companion_System/LAPORAN_VERIFIKASI_COMPANION.md` | Bukti sistem companion berjalan |
