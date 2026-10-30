@@ -129,6 +129,7 @@ public sealed partial class AISettingsPage : Page
             PerformanceModelBox.Text = _aiSettings.Models.PerformanceScoring;
             VoiceIntentModelBox.Text = _aiSettings.Models.VoiceIntent;
             FallbackModelBox.Text = _aiSettings.Models.Fallback;
+            DryLandAlertToggle.IsOn = _aiSettings.DryLandAlertEnabled;
             LoadVisionRuntimeSettings();
             UpdateProviderDiagnosticText("Diagnostic siap. Gunakan tombol test provider untuk verifikasi koneksi.");
         }
@@ -291,6 +292,12 @@ public sealed partial class AISettingsPage : Page
             _aiSettings.Models.PerformanceScoring = TextOrFallback(PerformanceModelBox.Text, _aiSettings.Models.PerformanceScoring);
             _aiSettings.Models.VoiceIntent = TextOrFallback(VoiceIntentModelBox.Text, _aiSettings.Models.VoiceIntent);
             _aiSettings.Models.Fallback = TextOrFallback(FallbackModelBox.Text, _aiSettings.Models.Fallback);
+            _aiSettings.DryLandAlertEnabled = DryLandAlertToggle.IsOn;
+            _settingsService.SaveBool("DryLandAlertEnabled", DryLandAlertToggle.IsOn);
+            if (_settingsService.Settings?.Ui != null)
+            {
+                _settingsService.Settings.Ui.EnableDryLandAlert = DryLandAlertToggle.IsOn;
+            }
 
             ApplyVisionRuntimeSettings();
             await RestartAnomalyDetectionIfRunningAsync();

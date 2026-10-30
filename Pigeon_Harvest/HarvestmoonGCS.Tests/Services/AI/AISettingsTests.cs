@@ -26,6 +26,7 @@ public class AISettingsTests
         Assert.Equal("https://pigeon-gcs.app", settings.SiteUrl);
         Assert.Equal("Pigeon GCS - PIA", settings.SiteName);
         Assert.Equal(30, settings.HistoryRetentionDays);
+        Assert.True(settings.DryLandAlertEnabled);
     }
 
     [Fact]
@@ -208,6 +209,7 @@ public class AISettingsTests
         Assert.True(restored.AnomalyDetection.RuleBasedEnabled);
         Assert.Equal(15, restored.AnomalyDetection.Thresholds.BatteryCritical);
         Assert.Equal(45, restored.HistoryRetentionDays);
+        Assert.True(restored.DryLandAlertEnabled);
     }
 
     [Fact]

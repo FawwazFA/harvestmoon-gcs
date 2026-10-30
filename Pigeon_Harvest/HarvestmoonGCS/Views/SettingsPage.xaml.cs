@@ -88,6 +88,11 @@ public sealed partial class SettingsPage : Page
             HighContrastCheck.IsChecked = _viewModel.HighContrastMode;
             ShowTooltipsCheck.IsChecked = _viewModel.ShowTooltips;
             AnimationsCheck.IsChecked = _viewModel.EnableAnimations;
+
+            var settingsService = App.Current.Services.GetService<ISettingsService>();
+            bool dryLandAlert = settingsService?.GetBool("DryLandAlertEnabled", _viewModel.DryLandAlertEnabled) ?? _viewModel.DryLandAlertEnabled;
+            _viewModel.DryLandAlertEnabled = dryLandAlert;
+            DryLandAlertCheck.IsChecked = dryLandAlert;
         }
         catch (Exception ex)
         {
@@ -108,6 +113,18 @@ public sealed partial class SettingsPage : Page
             _viewModel.HighContrastMode = HighContrastCheck.IsChecked ?? false;
             _viewModel.ShowTooltips = ShowTooltipsCheck.IsChecked ?? true;
             _viewModel.EnableAnimations = AnimationsCheck.IsChecked ?? true;
+            _viewModel.DryLandAlertEnabled = DryLandAlertCheck.IsChecked ?? true;
+
+            var settingsService = App.Current.Services.GetService<ISettingsService>();
+            if (settingsService != null)
+            {
+                settingsService.SaveBool("DryLandAlertEnabled", _viewModel.DryLandAlertEnabled);
+                if (settingsService.Settings?.AI != null)
+                    settingsService.Settings.AI.DryLandAlertEnabled = _viewModel.DryLandAlertEnabled;
+                if (settingsService.Settings?.Ui != null)
+                    settingsService.Settings.Ui.EnableDryLandAlert = _viewModel.DryLandAlertEnabled;
+                _ = settingsService.SaveSettingsAsync();
+            }
         }
         catch (Exception ex)
         {

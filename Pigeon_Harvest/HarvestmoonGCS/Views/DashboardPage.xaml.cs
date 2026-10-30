@@ -70,6 +70,9 @@ public sealed partial class DashboardPage : Page
     private readonly IMavLinkService? _mavLinkService;
     private readonly ISoilMoistureService? _soilMoistureService;
     private readonly IIrrigationService? _irrigationService;
+    private readonly ISettingsService? _settingsService;
+    private DateTime _lastDryLandAlertTime = DateTime.MinValue;
+    private DateTime _lastDryLandConditionSeen = DateTime.MinValue;
 
     private TelemetryData? _telemetry;
     private byte[]? _lastFrameData;
@@ -207,6 +210,7 @@ public sealed partial class DashboardPage : Page
         _waypointService = App.Current.Services.GetService<IWaypointService>();
         _soilMoistureService = App.Current.Services.GetService<ISoilMoistureService>();
         _irrigationService = App.Current.Services.GetService<IIrrigationService>();
+        _settingsService = App.Current.Services.GetService<ISettingsService>();
 
         _currentScenario = _videoScenarioService?.CurrentScenario ?? new VideoScenarioService().CurrentScenario;
         _demoWaypoints = _currentScenario.Waypoints.Select(w => (w.Latitude, w.Longitude)).ToArray();
@@ -1252,6 +1256,12 @@ public sealed partial class DashboardPage : Page
             double liveFhi = root.TryGetProperty("fhi", out var fhiProp) && fhiProp.TryGetDouble(out var fVal) ? fVal : -1.0;
             if (total == 0 && liveFhi < 0) return;
             _classifyRealData = (healthy, stress, drought, bareSoil, Math.Max(total, 1), liveFhi);
+
+            if (drought >= 15 || bareSoil >= 20)
+            {
+                var dominantType = bareSoil >= 20 ? "Defisit Air Tanah & Retakan" : "Defisit Air Kanopi";
+                CheckAndTriggerDryLandAlert($"Klasifikasi HSV/AI: {dominantType} terdeteksi ({Math.Max(drought, bareSoil)}% area)", bareSoil >= 20 ? "DEFISIT AIR KRITIS" : "DEFISIT AIR KANOPI");
+            }
         }
         catch { }
     }
@@ -1494,6 +1504,21 @@ public sealed partial class DashboardPage : Page
                         drought * 100.0 / total,
                         bareSoil * 100.0 / total
                     );
+
+                    // Check dry land / drought condition
+                    if (drought > 0 || bareSoil > 0)
+                    {
+                        var droughtType = bareSoil > 0 ? "Defisit Air Tanah & Retakan Kering" : "Defisit Air Kanopi (Stres Kekeringan)";
+                        var count = drought + bareSoil;
+                        CheckAndTriggerDryLandAlert($"Terdeteksi {count} area {droughtType} pada frame UAV", bareSoil > 0 ? "DEFISIT AIR KRITIS" : "DEFISIT AIR KANOPI");
+                    }
+                    else if (DryLandNotificationBanner != null && DryLandNotificationBanner.Visibility == Visibility.Visible)
+                    {
+                        if ((DateTime.UtcNow - _lastDryLandConditionSeen).TotalSeconds >= 12.0)
+                        {
+                            DryLandNotificationBanner.Visibility = Visibility.Collapsed;
+                        }
+                    }
                 }
             });
         }
@@ -2890,6 +2915,10 @@ public sealed partial class DashboardPage : Page
                 DetectionsListStack.Children.Add(BuildCropDetectionRow("Ketidakmerataan Irigasi (2 objek)", NormalizeDemoConfidence(0.89)));
                 DetectionsListStack.Children.Add(BuildCropDetectionRow("Defisit Air (Kanopi) (1 objek)", NormalizeDemoConfidence(0.86)));
                 DetectionsListStack.Children.Add(BuildCropDetectionRow("Defisit Air (Tanah) (1 objek)",      NormalizeDemoConfidence(0.88)));
+                if (DryLandNotificationBanner != null && (DateTime.UtcNow - _lastDryLandConditionSeen).TotalSeconds >= 10.0)
+                {
+                    DryLandNotificationBanner.Visibility = Visibility.Collapsed;
+                }
                 break;
 
             case 1:
@@ -2926,6 +2955,10 @@ public sealed partial class DashboardPage : Page
                 DetectionsListStack.Children.Add(BuildCropDetectionRow("Zona Normal (3 objek)",           NormalizeDemoConfidence(0.92)));
                 DetectionsListStack.Children.Add(BuildCropDetectionRow("Defisit Air (Kanopi) (2 objek)", NormalizeDemoConfidence(0.87)));
                 DetectionsListStack.Children.Add(BuildCropDetectionRow("Defisit Air (Tanah) (1 objek)",      NormalizeDemoConfidence(0.89)));
+                if (DryLandNotificationBanner != null && (DateTime.UtcNow - _lastDryLandConditionSeen).TotalSeconds >= 10.0)
+                {
+                    DryLandNotificationBanner.Visibility = Visibility.Collapsed;
+                }
                 break;
 
             case 2:
@@ -2936,6 +2969,8 @@ public sealed partial class DashboardPage : Page
                 dBareSoil  = 8.0;
                 fhiScore   = 66.4 + Math.Sin(step * 0.2) * 0.7;
                 avgConf    = 0.90;
+
+                CheckAndTriggerDryLandAlert("Sektor C terdeteksi defisit air kanopi tajuk tanaman (42% area terdampak)", "DEFISIT AIR KANOPI");
 
                 dynamicOverlays = new List<VideoDetectionOverlay>
                 {
@@ -2974,6 +3009,8 @@ public sealed partial class DashboardPage : Page
                 fhiScore   = 46.5 + Math.Sin(step * 0.2) * 0.6;
                 avgConf    = 0.93;
 
+                CheckAndTriggerDryLandAlert("Sektor D terdeteksi defisit kritis air tanah & retakan kering (46% area retak)", "DEFISIT AIR KRITIS");
+
                 dynamicOverlays = new List<VideoDetectionOverlay>
                 {
                     // 7 x Defisit Air (Tanah) - Bounding Box Merah Kritis
@@ -3010,6 +3047,11 @@ public sealed partial class DashboardPage : Page
                 dBareSoil  = 12.1;
                 fhiScore   = 85.4 + Math.Sin(step * 0.2) * 0.5;
                 avgConf    = 0.92;
+
+                if (DryLandNotificationBanner != null && (DateTime.UtcNow - _lastDryLandConditionSeen).TotalSeconds >= 10.0)
+                {
+                    DryLandNotificationBanner.Visibility = Visibility.Collapsed;
+                }
 
                 dynamicOverlays = new List<VideoDetectionOverlay>
                 {
@@ -4386,6 +4428,79 @@ sys.stdout.buffer.write(buf.tobytes())
     {
         _lastAlertSignature = null;
         AlertsStack.Children.Insert(0, BuildAlertRow(text, DateTime.Now.ToString("HH:mm:ss"), severity));
+    }
+
+    public bool IsDryLandAlertEnabled()
+    {
+        try
+        {
+            var ss = _settingsService ?? App.Current.Services.GetService<ISettingsService>();
+            if (ss != null)
+            {
+                if (ss.Settings?.AI?.DryLandAlertEnabled == false) return false;
+                if (ss.Settings?.Ui?.EnableDryLandAlert == false) return false;
+                return ss.GetBool("DryLandAlertEnabled", true);
+            }
+        }
+        catch { }
+        return true;
+    }
+
+    private void CheckAndTriggerDryLandAlert(string detectionDetails, string severity = "DEFISIT AIR KRITIS")
+    {
+        if (!IsDryLandAlertEnabled())
+        {
+            if (DryLandNotificationBanner != null && DryLandNotificationBanner.Visibility == Visibility.Visible)
+            {
+                DryLandNotificationBanner.Visibility = Visibility.Collapsed;
+            }
+            return;
+        }
+
+        var now = DateTime.UtcNow;
+        _lastDryLandConditionSeen = now;
+        bool isNewAlertInterval = (now - _lastDryLandAlertTime).TotalSeconds >= 8.0;
+
+        DispatcherQueue.TryEnqueue(() =>
+        {
+            if (DryLandNotificationBanner != null)
+            {
+                if (DryLandAlertSeverityBadge != null) DryLandAlertSeverityBadge.Text = severity;
+                if (DryLandAlertDetailsText != null) DryLandAlertDetailsText.Text = detectionDetails;
+                if (DryLandAlertTimeText != null) DryLandAlertTimeText.Text = DateTime.Now.ToString("HH:mm:ss");
+                DryLandNotificationBanner.Visibility = Visibility.Visible;
+            }
+
+            if (isNewAlertInterval)
+            {
+                _lastDryLandAlertTime = now;
+
+                // 1. Catat ke Operational Notes panel
+                AddAlertRow($"PERINGATAN: Lahan Kering Terdeteksi · {detectionDetails}", "critical");
+
+                // 2. Catat ke Timeline insiden misi
+                _timelineService?.Add("drought_alert", $"Peringatan Lahan Kering: {detectionDetails}", "critical");
+
+                // 3. Audio / Speech Alert via AlertManager
+                try
+                {
+                    var alertManager = App.Current.Services.GetService<IAlertManager>();
+                    if (alertManager != null)
+                    {
+                        _ = alertManager.QueueCustomAlertAsync("Perhatian, lahan kering terdeteksi!", AlertPriority.High);
+                    }
+                }
+                catch { }
+            }
+        });
+    }
+
+    private void DismissDryLandAlertButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (DryLandNotificationBanner != null)
+        {
+            DryLandNotificationBanner.Visibility = Visibility.Collapsed;
+        }
     }
 
     private void GoCropAnalysisButton_Click(object sender, RoutedEventArgs e)

@@ -167,5 +167,44 @@ public class SettingsServiceTests
         Assert.False(settings.ShowAdvancedOptions);
         Assert.True(settings.EnableSoundAlerts);
         Assert.False(settings.EnableVoiceAlerts);
+        Assert.True(settings.EnableDryLandAlert);
+    }
+
+    [Fact]
+    public async Task DryLandAlert_SaveAndLoad_TogglesProperly()
+    {
+        var settingsPath = CreateSettingsPath();
+        var service1 = new JsonSettingsService(settingsPath);
+        await service1.LoadSettingsAsync();
+
+        // Default should be true
+        Assert.True(service1.GetBool("DryLandAlertEnabled", true));
+        Assert.True(service1.Settings.AI.DryLandAlertEnabled);
+        Assert.True(service1.Settings.Ui.EnableDryLandAlert);
+
+        // Turn OFF
+        service1.SaveBool("DryLandAlertEnabled", false);
+        service1.Settings.AI.DryLandAlertEnabled = false;
+        service1.Settings.Ui.EnableDryLandAlert = false;
+        await service1.SaveSettingsAsync();
+
+        // Reload in new instance
+        var service2 = new JsonSettingsService(settingsPath);
+        await service2.LoadSettingsAsync();
+        Assert.False(service2.GetBool("DryLandAlertEnabled", true));
+        Assert.False(service2.Settings.AI.DryLandAlertEnabled);
+        Assert.False(service2.Settings.Ui.EnableDryLandAlert);
+
+        // Turn ON again
+        service2.SaveBool("DryLandAlertEnabled", true);
+        service2.Settings.AI.DryLandAlertEnabled = true;
+        service2.Settings.Ui.EnableDryLandAlert = true;
+        await service2.SaveSettingsAsync();
+
+        var service3 = new JsonSettingsService(settingsPath);
+        await service3.LoadSettingsAsync();
+        Assert.True(service3.GetBool("DryLandAlertEnabled", false));
+        Assert.True(service3.Settings.AI.DryLandAlertEnabled);
+        Assert.True(service3.Settings.Ui.EnableDryLandAlert);
     }
 }

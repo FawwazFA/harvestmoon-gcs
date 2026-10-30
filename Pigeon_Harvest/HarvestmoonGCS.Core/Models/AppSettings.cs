@@ -273,6 +273,7 @@ public class UiSettings : INotifyPropertyChanged
     private bool _showAdvancedOptions = false;
     private bool _enableSoundAlerts = true;
     private bool _enableVoiceAlerts = false;
+    private bool _enableDryLandAlert = true;
 
     /// <summary>
     /// Tema aplikasi (Light, Dark)
@@ -308,6 +309,15 @@ public class UiSettings : INotifyPropertyChanged
     {
         get => _enableVoiceAlerts;
         set => SetProperty(ref _enableVoiceAlerts, value);
+    }
+
+    /// <summary>
+    /// Aktifkan notifikasi saat lahan kering / defisit air terdeteksi
+    /// </summary>
+    public bool EnableDryLandAlert
+    {
+        get => _enableDryLandAlert;
+        set => SetProperty(ref _enableDryLandAlert, value);
     }
 
     protected bool SetProperty<T>(ref T field, T value, [CallerMemberName] string? propertyName = null)

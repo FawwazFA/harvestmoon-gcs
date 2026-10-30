@@ -120,6 +120,57 @@
             <!-- ================ LEFT COLUMN ================ -->
             <StackPanel Grid.Column="0" Spacing="12">
 
+                <!-- Dry Land Detection Floating Notification Banner -->
+                <Border x:Name="DryLandNotificationBanner"
+                        Visibility="Collapsed"
+                        Background="#FEF2F2"
+                        BorderBrush="#EF4444"
+                        BorderThickness="1.5"
+                        CornerRadius="12"
+                        Padding="14,10"
+                        Margin="0,0,0,4">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Alert Icon Pill -->
+                        <Border Grid.Column="0" Width="36" Height="36" CornerRadius="18" Background="#FEE2E2" VerticalAlignment="Center" Margin="0,0,12,0">
+                            <FontIcon Glyph="&#xE7BA;" FontSize="18" Foreground="#DC2626" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+
+                        <!-- Alert Message -->
+                        <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2">
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <TextBlock Text="PERINGATAN: Lahan Kering Terdeteksi!" FontWeight="Bold" FontSize="13" Foreground="#991B1B"/>
+                                <Border Background="#DC2626" CornerRadius="4" Padding="6,1" VerticalAlignment="Center">
+                                    <TextBlock x:Name="DryLandAlertSeverityBadge" Text="DEFISIT AIR KRITIS" FontSize="10" FontWeight="Bold" Foreground="White"/>
+                                </Border>
+                                <TextBlock x:Name="DryLandAlertTimeText" Text="12:00:00" FontSize="11" Foreground="#991B1B" Opacity="0.8" VerticalAlignment="Center"/>
+                            </StackPanel>
+                            <TextBlock x:Name="DryLandAlertDetailsText" 
+                                       Text="Kamera drone mendeteksi kondisi kekeringan / defisit air tanah pada sektor aktif." 
+                                       FontSize="12" Foreground="#B91C1C" TextWrapping="Wrap"/>
+                        </StackPanel>
+
+                        <!-- Action / Dismiss Button -->
+                        <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="6" VerticalAlignment="Center" Margin="12,0,0,0">
+                            <Button x:Name="DismissDryLandAlertButton"
+                                    Content="✕ Tutup"
+                                    FontSize="11"
+                                    Padding="10,4"
+                                    CornerRadius="6"
+                                    Background="White"
+                                    BorderBrush="#FCA5A5"
+                                    BorderThickness="1"
+                                    Foreground="#991B1B"
+                                    Click="DismissDryLandAlertButton_Click"/>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
                 <!-- === Live Monitoring Card === -->
                 <Border Style="{StaticResource HarvestCardStyle}">
                     <Grid>

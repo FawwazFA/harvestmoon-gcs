@@ -351,6 +351,8 @@ public class JsonSettingsService : ISettingsService
         _settings["Map.DefaultWaypointRadius"] = _appSettings.Map.DefaultWaypointRadius;
         _settings["AISettings"] = CloneAISettingsWithoutSecrets(_appSettings.AI);
         _settings["VisionRuntime"] = _appSettings.VisionRuntime;
+        _settings["DryLandAlertEnabled"] = _appSettings.AI.DryLandAlertEnabled;
+        _settings["Ui.EnableDryLandAlert"] = _appSettings.Ui.EnableDryLandAlert;
     }
 
     private void ApplyDictionaryToAppSettings()
@@ -388,6 +390,15 @@ public class JsonSettingsService : ISettingsService
         if (_settings.TryGetValue("VisionRuntime", out var visionRuntime))
         {
             _appSettings.VisionRuntime = ConvertToVisionRuntimeSettings(visionRuntime, _appSettings.VisionRuntime);
+        }
+
+        if (_settings.TryGetValue("DryLandAlertEnabled", out var dryAlert))
+        {
+            if (bool.TryParse(dryAlert?.ToString(), out var bVal))
+            {
+                _appSettings.AI.DryLandAlertEnabled = bVal;
+                _appSettings.Ui.EnableDryLandAlert = bVal;
+            }
         }
     }
 
@@ -432,6 +443,14 @@ public class JsonSettingsService : ISettingsService
         if (key == "VisionRuntime")
         {
             _appSettings.VisionRuntime = ConvertToVisionRuntimeSettings(value, _appSettings.VisionRuntime);
+            return;
+        }
+
+        if (key == "DryLandAlertEnabled" && bool.TryParse(value?.ToString(), out var dryLandVal))
+        {
+            _appSettings.AI.DryLandAlertEnabled = dryLandVal;
+            _appSettings.Ui.EnableDryLandAlert = dryLandVal;
+            return;
         }
     }
 
@@ -446,6 +465,7 @@ public class JsonSettingsService : ISettingsService
             "Map.DefaultWaypointRadius" => _appSettings.Map.DefaultWaypointRadius,
             "AISettings" => _appSettings.AI,
             "VisionRuntime" => _appSettings.VisionRuntime,
+            "DryLandAlertEnabled" => _appSettings.AI.DryLandAlertEnabled,
             _ => null
         };
     }
@@ -599,7 +619,8 @@ public class JsonSettingsService : ISettingsService
                 Cache = source.Cache,
                 VoiceCommand = source.VoiceCommand,
                 AnomalyDetection = source.AnomalyDetection,
-                HistoryRetentionDays = source.HistoryRetentionDays
+                HistoryRetentionDays = source.HistoryRetentionDays,
+                DryLandAlertEnabled = source.DryLandAlertEnabled
             };
         }
     }

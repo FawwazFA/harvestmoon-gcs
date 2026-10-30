@@ -158,6 +158,7 @@
                         </ComboBox>
 
                         <!-- Toggles -->
+                        <CheckBox x:Name="DryLandAlertCheck" Content="Notifikasi Deteksi Lahan Kering (Dry Land / Drought Alert)" IsChecked="True" Margin="0,0,0,8" ToolTipService.ToolTip="Aktifkan notifikasi peringatan visual dan suara ketika terdeteksi kondisi lahan kering / defisit air kritis"/>
                         <CheckBox x:Name="HighContrastCheck" Content="High contrast (outdoor)" IsChecked="False" Margin="0,0,0,8"/>
                         <CheckBox x:Name="OfflineMapCheck" Content="Offline map cache" IsChecked="True" Margin="0,0,0,8"/>
                         <CheckBox x:Name="VoiceAlertCheck" Content="Voice alert" IsChecked="False" Margin="0,0,0,8"/>

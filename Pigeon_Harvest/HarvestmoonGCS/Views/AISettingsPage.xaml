@@ -176,6 +176,37 @@
                                    TextWrapping="Wrap"
                                    Foreground="{ThemeResource MutedForegroundBrush}"/>
 
+                        <!-- Notifikasi Deteksi Lahan Kering -->
+                        <Border Background="{ThemeResource BackgroundBrush}"
+                                BorderBrush="{ThemeResource BorderBrush}"
+                                BorderThickness="1"
+                                CornerRadius="8"
+                                Padding="12,10"
+                                Margin="0,8,0,4">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" VerticalAlignment="Center" Spacing="2">
+                                    <TextBlock Text="Notifikasi Deteksi Lahan Kering"
+                                               FontWeight="SemiBold"
+                                               Foreground="{ThemeResource ForegroundBrush}"
+                                               FontSize="13"/>
+                                    <TextBlock Text="Berikan peringatan visual dan notifikasi suara saat drone mendeteksi lahan kering atau defisit air kritis."
+                                               FontSize="11"
+                                               Foreground="{ThemeResource MutedForegroundBrush}"
+                                               TextWrapping="Wrap"/>
+                                </StackPanel>
+                                <ToggleSwitch Grid.Column="1"
+                                              x:Name="DryLandAlertToggle"
+                                              OnContent="Aktif"
+                                              OffContent="Mati"
+                                              IsOn="True"
+                                              VerticalAlignment="Center"/>
+                            </Grid>
+                        </Border>
+
                         <Button x:Name="AdvancedToggleButton"
                                 Content="Show Advanced Settings"
                                 Click="AdvancedToggleButton_Click"

@@ -163,6 +163,13 @@ public class SettingsViewModel : INotifyPropertyChanged
         set => SetProperty(ref _flightModeAlertEnabled, value);
     }
 
+    private bool _dryLandAlertEnabled = true;
+    public bool DryLandAlertEnabled
+    {
+        get => _dryLandAlertEnabled;
+        set => SetProperty(ref _dryLandAlertEnabled, value);
+    }
+
     #endregion
 
     #region UI Settings
@@ -333,6 +340,7 @@ public class SettingsViewModel : INotifyPropertyChanged
                 ConnectionAlertEnabled = ConnectionAlertEnabled,
                 GeofenceAlertEnabled = GeofenceAlertEnabled,
                 FlightModeAlertEnabled = FlightModeAlertEnabled,
+                DryLandAlertEnabled = DryLandAlertEnabled,
 
                 // UI
                 ThemeIndex = ThemeIndex,
@@ -423,6 +431,7 @@ public class SettingsViewModel : INotifyPropertyChanged
                 ConnectionAlertEnabled = settings.ConnectionAlertEnabled;
                 GeofenceAlertEnabled = settings.GeofenceAlertEnabled;
                 FlightModeAlertEnabled = settings.FlightModeAlertEnabled;
+                DryLandAlertEnabled = settings.DryLandAlertEnabled;
 
                 // UI
                 ThemeIndex = settings.ThemeIndex;
@@ -484,6 +493,7 @@ public class SettingsViewModel : INotifyPropertyChanged
         ConnectionAlertEnabled = true;
         GeofenceAlertEnabled = true;
         FlightModeAlertEnabled = true;
+        DryLandAlertEnabled = true;
 
         // UI
         ThemeIndex = 0;
@@ -690,6 +700,7 @@ public class AppSettings
     public bool ConnectionAlertEnabled { get; set; }
     public bool GeofenceAlertEnabled { get; set; }
     public bool FlightModeAlertEnabled { get; set; }
+    public bool DryLandAlertEnabled { get; set; } = true;
 
     // UI
     public int ThemeIndex { get; set; }

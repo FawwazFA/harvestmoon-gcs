@@ -24,6 +24,7 @@ public class AISettings : INotifyPropertyChanged
     private VoiceCommandConfig _voiceCommand = new();
     private AnomalyDetectionConfig _anomalyDetection = new();
     private int _historyRetentionDays = 30;
+    private bool _dryLandAlertEnabled = true;
 
     /// <summary>
     /// Enable or disable AI features
@@ -32,6 +33,15 @@ public class AISettings : INotifyPropertyChanged
     {
         get => _enabled;
         set => SetProperty(ref _enabled, value);
+    }
+
+    /// <summary>
+    /// Mengaktifkan notifikasi peringatan saat lahan kering atau defisit air terdeteksi
+    /// </summary>
+    public bool DryLandAlertEnabled
+    {
+        get => _dryLandAlertEnabled;
+        set => SetProperty(ref _dryLandAlertEnabled, value);
     }
 
     /// <summary>
